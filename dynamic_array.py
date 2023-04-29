@@ -1,6 +1,4 @@
 
-
-
 from static_array import StaticArray
 
 
@@ -136,7 +134,8 @@ class DynamicArray:
 
     def resize(self, new_capacity: int) -> None:
         """
-        TODO: Write this implementation
+        Change the capacity of the underlying storage for the elements in the
+        dynamic array
         """
         pass
         if new_capacity == 0 or new_capacity < self._size:
@@ -149,7 +148,7 @@ class DynamicArray:
 
     def append(self, value: object) -> None:
         """
-        TODO: Write this implementation
+        Add a new value at the end of the dynamic array
         """
         pass
         if self._size == self._capacity:
@@ -159,51 +158,45 @@ class DynamicArray:
 
     def insert_at_index(self, index: int, value: object) -> None:
         """
-        TODO: Write this implementation
+        Add a new value at the specified index in the dynamic array
         """
         pass
         if index < 0 or index > self._size:
             raise DynamicArrayException()
 
-        # array is full, double the size (using the existing resize method)
         if self._size == self._capacity:
             self.resize(2 * self._capacity)
-        # loop to copy the elements from end to index 1 position to right
+
         for j in range(self._size, index, -1):
             self._data[j] = self._data[j - 1]
-        self._data[index] = value  # set the value to data at index
-        self._size += 1  # increment the size
+        self._data[index] = value
+        self._size += 1
 
     def remove_at_index(self, index: int) -> None:
         """
-        Removes element from dynamic array at given index.
-        If index is invalid, raises DynamicArrayException.
+        Remove element from dynamic array at given index
         """
         if index < 0 or index >= self._size:
-            raise DynamicArrayException("Invalid index")
+            raise DynamicArrayException("Index out of range")
 
-        for i in range(index, self._size - 1):
-            self._data[i] = self._data[i + 1]
+        if self._size < self._capacity / 4 and self._capacity > 10:
+            new_capacity = max(self._size * 2, 10)
+            new_data = StaticArray(new_capacity)
+            for i in range(self._size):
+                new_data[i] = self._data[i]
+            self._data = new_data
+            self._capacity = new_capacity
+
+        else:
+            for i in range(index, self._size - 1):
+                self._data[i] = self._data[i + 1]
 
         self._size -= 1
-        if self._size < self._capacity // 2:
-            self._shrink()
-
-    def _shrink(self):
-        """
-        Shrinks the size of the dynamic array by half if the number of elements
-        is less than or equal to a quarter of the capacity.
-        """
-        new_capacity = max(self._capacity // 2, 4)
-        new_data = StaticArray(new_capacity)
-        for i in range(self._size):
-            new_data[i] = self._data[i]
-        self._data = new_data
-        self._capacity = new_capacity
 
     def slice(self, start_index: int, size: int) -> "DynamicArray":
         """
-        TODO: Write this implementation
+        Return a new DynamicArray object that contains the requested number
+        of elements from the original array
         """
         if start_index < 0 or start_index >= self._size:
             raise DynamicArrayException("Invalid start index")
@@ -217,42 +210,28 @@ class DynamicArray:
             new_array.append(self._data[i])
         return new_array
 
-
-
     def merge(self, second_da: "DynamicArray") -> None:
-        # create new dynamic array with capacity equal to the sum of the capacities of the two arrays being merged
-        result = DynamicArray(start_array=[None] * (self._capacity + second_da._capacity))
-
-        # add elements from first array to result array
-        for i in range(self._size):
-            result.append(self._data[i])
-
-        # add elements from second array to result array
-        for i in range(second_da._size):
-            result.append(second_da._data[i])
-
-        # set the current array's data to the result array's data
-        self._data = result._data
-
-        # update the current array's size to be the size of the result array
-        self._size = result._size
-
+        """
+        Take another DynamicArray object as a parameter, and append all
+        elements from this array onto the current one
+        """
+        for item in second_da:
+            self.append(item)
 
     def map(self, map_func):
         """
-        Apply a given function to each element of the dynamic array and return a new dynamic array
-        with the results.
+        Apply a given function to each element of the dynamic array and return
+        a new dynamic array with the results
         """
         new_da = DynamicArray()
         for i in range(self._size):
             new_da.append(map_func(self[i]))
         return new_da
 
-
     def filter(self, filter_func):
         """
-        Apply a given function to each element of the dynamic array and return a new dynamic array
-        with the elements that satisfy the function.
+        Apply a given function to each element of the dynamic array and return
+        a new dynamic array with the elements that satisfy the function
         """
         new_da = DynamicArray()
         for i in range(self._size):
@@ -261,6 +240,10 @@ class DynamicArray:
         return new_da
 
     def reduce(self, reduce_func, initializer=None) -> object:
+        """
+        Apply the reduce_func to all elements of the dynamic array and
+        return the resulting value
+        """
         if self._size == 0:
             return initializer
 
@@ -277,24 +260,40 @@ class DynamicArray:
         return result
 
 def find_mode(arr: DynamicArray) -> (DynamicArray, int):
-    freq_dict = {}
+    """
+    Receive a dynamic array already in sorted order, either non-descending
+    or non-ascending
+    """
+    mode_val = arr[0]
+    mode_count = 1
+    curr_val = arr[0]
+    curr_count = 1
+    mode_arr = DynamicArray()
 
-    # Count the frequency of each element
-    for i in range(arr._size):
-        element = arr._data[i]
-        freq_dict[element] = freq_dict.get(element, 0) + 1
+    for i in range(1, arr.length()):
+        if arr[i] == curr_val:
+            curr_count += 1
+        else:
+            if curr_count > mode_count:
+                mode_val = curr_val
+                mode_count = curr_count
+                mode_arr = DynamicArray()
+                mode_arr.append(curr_val)
+            elif curr_count == mode_count:
+                mode_arr.append(curr_val)
 
-    # Find the mode and its frequency
-    mode = DynamicArray()
-    mode_freq = 0
-    for element, freq in freq_dict.items():
-        if freq > mode_freq:
-            mode = DynamicArray([element])
-            mode_freq = freq
-        elif freq == mode_freq:
-            mode.append(element)
+            curr_val = arr[i]
+            curr_count = 1
 
-    return (mode, mode_freq)
+    if curr_count > mode_count:
+        mode_val = curr_val
+        mode_count = curr_count
+        mode_arr = DynamicArray()
+        mode_arr.append(curr_val)
+    elif curr_count == mode_count:
+        mode_arr.append(curr_val)
+
+    return mode_arr, mode_count
 
 
 # ------------------- BASIC TESTING -----------------------------------------

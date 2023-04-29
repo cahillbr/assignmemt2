@@ -1,12 +1,12 @@
-# Name: Brendan Cahill
-# # OSU Email: cahillbr@oregonstate,edu
-# # Course: CS261 - Data Structures
-# # Assignment: 2
-# # Due Date: 2/6/2023
-# # Description:
+# Name:
+# OSU Email:
+# Course: CS261 - Data Structures
+# Assignment:
+# Due Date:
+# Description:
 
 
-from dynamic_array import DynamicArrayException
+from dynamic_array import *
 
 
 class Bag:
@@ -17,7 +17,8 @@ class Bag:
         """
         self._da = DynamicArray()
 
-
+        # populate bag with initial values (if provided)
+        # before using this feature, implement add() method
         if start_bag is not None:
             for value in start_bag:
                 self.add(value)
@@ -40,70 +41,77 @@ class Bag:
         return self._da.length()
 
     # -----------------------------------------------------------------------
-    class Bag(DynamicArray):
-        def add(self, value):
-            """
-            Add a new value to the Bag
-            """
-            self.append(value)
-        pass
+
+    def add(self, value: object) -> None:
+        """
+        Add a new element to the bag
+        """
+        self._da.append(value)
 
     def remove(self, value: object) -> bool:
         """
-        TODO: Write this implementation
+        Remove any one element from the bag that matches the provided
+        value object
         """
-        try:
-            index = self._data.index(value)
-            self.pop(index)
-        except ValueError:
-            raise ValueError("Value not found in the Bag")
-
-        pass
+        for i in range(self.size()):
+            if self._da.get_at_index(i) == value:
+                self._da.remove_at_index(i)
+                return True
+        return False
 
     def count(self, value: object) -> int:
         """
-        TODO: Write this implementation
+        Returns the number of elements in the bag that match the provided
+        value object
         """
         count = 0
-        for item in self._data:
-            if item == value:
+        for i in range(self.size()):
+            if self._da.get_at_index(i) == value:
                 count += 1
         return count
-        pass
 
     def clear(self) -> None:
         """
-        TODO: Write this implementation
+        Clear the contents of the bag
         """
-        self._size = 0
-        self._capacity = 4
-        self._data = DynamicArray(self._capacity)
-
-        pass
+        self._da = DynamicArray()
 
     def equal(self, second_bag: "Bag") -> bool:
         """
-        TODO: Write this implementation
+        Compares the contents of a bag with the contents of a second
+        bag provided
         """
-        if len(self) != len(other_bag):
+        if self.size() != second_bag.size():
             return False
-        for item in self:
-            if self.count(item) != other_bag.count(item):
+
+        for item1 in self:
+            found = False
+            for item2 in second_bag:
+                if item1 == item2:
+                    found = True
+            if not found:
                 return False
+
         return True
-        pass
 
     def __iter__(self):
         """
-        TODO: Write this implementation
+        Enables the Bag to iterate across itself.
         """
-        pass
+        self._iter_index = 0
+        return self
 
     def __next__(self):
         """
-        TODO: Write this implementation
+        Return the next item in the Bag, based on the current location of the
+        iterator
         """
-        pass
+        if self._iter_index >= self.size():
+            raise StopIteration
+
+        item = self._da.get_at_index(self._iter_index)
+        self._iter_index += 1
+        return item
 
 
 # ------------------- BASIC TESTING -----------------------------------------
