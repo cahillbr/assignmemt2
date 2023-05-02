@@ -1,9 +1,10 @@
-# Name:
-# OSU Email:
+
+# Name:Brendan Cahill
+# OSU Email:cahillbr@oregonstate.edu
 # Course: CS261 - Data Structures
-# Assignment:
-# Due Date:
-# Description:
+# Assignment: 2
+# Due Date:5/1/24
+# Description:Dynamic Array and ADT Implementation
 
 
 from dynamic_array import *
